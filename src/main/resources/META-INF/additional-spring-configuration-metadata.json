@@ -1,0 +1,17 @@
+{"properties": [
+  {
+    "name": "app.jwt.jwtSecret",
+    "type": "java.lang.String",
+    "description": "A description for 'app.jwt.jwtSecret'"
+  },
+  {
+    "name": "app.jwt.jwtSecret",
+    "type": "java.lang.String",
+    "description": "A description for 'app.jwt.jwtSecret'"
+  },
+  {
+    "name": "management.security.enabled",
+    "type": "java.lang.String",
+    "description": "A description for 'management.security.enabled'"
+  }
+]}
