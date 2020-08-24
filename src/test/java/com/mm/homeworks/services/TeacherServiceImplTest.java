@@ -62,33 +62,21 @@ class TeacherServiceImplTest {
 
 	@BeforeEach
 	public void before() {
-		role = new Role() {
-			{
-				setAuthority(Authority.ADMIN);
-			}
-		};
+		role = new Role();
+		role.setAuthority(Authority.TEACHER);
 
 		user = new User();
 		user.setUsername(USERNAME);
 		user.setPassword(HASHED_PASSWORD);
 		user.addAuthority(role);
 
-		teacher = new Teacher() {
-			{
-				setFullname(FULLNAME);
-				setTitle(TITLE);
-				setUser(user);
-			}
-		};
+		teacher = new Teacher();
+		teacher.setFullname(FULLNAME);
+		teacher.setTitle(TITLE);
+		teacher.setUser(user);
 
 		user.setId(USER_ID);
-		optionalTeacher = Optional.of(new Teacher() {
-			{
-				setFullname(FULLNAME);
-				setTitle(TITLE);
-				setUser(user);
-			}
-		});
+		optionalTeacher = Optional.of(teacher);
 
 		teacherService = new TeacherServiceImpl(teacherRepositoryMock, userRepositoryMock, subjectRepositoryMock,
 				new ModelMapper(), new BCryptPasswordEncoder(), roleRepositoryMock);
@@ -96,27 +84,26 @@ class TeacherServiceImplTest {
 
 	@Test
 	void shouldCreateNewTeacher() throws ConstraintViolationException, DuplicateEntityException {
-		TeacherUserCreateRequest createRequest = new TeacherUserCreateRequest() {
-			{
-				setUsername(USERNAME);
-				setPassword(PASSWORD);
-				setConfirmPassword(PASSWORD);
-				setFullname(FULLNAME);
-				setTitle(TITLE.toString());
-			}
-		};
+		TeacherUserCreateRequest createRequest = new TeacherUserCreateRequest();
+		createRequest.setUsername(USERNAME);
+		createRequest.setFullname(FULLNAME);
+		createRequest.setPassword(PASSWORD);
+		createRequest.setConfirmPassword(PASSWORD);
+		createRequest.setTitle(TITLE.toString());
 
 		lenient().when(userRepositoryMock.findByUsername(createRequest.getUsername())).thenReturn(new ArrayList<>());
 		List<Role> roles = new ArrayList<Role>();
 		roles.add(role);
 		lenient().when(roleRepositoryMock.findByAuthorityName(Authority.TEACHER)).thenReturn(roles);
-		lenient().when(teacherRepositoryMock.saveAndFlush(teacher)).thenReturn(teacher);
+//		lenient().when(teacherRepositoryMock.saveAndFlush(any(Teacher.class))).thenReturn(optionalTeacher.get());
+		lenient().when(teacherRepositoryMock.saveAndFlush(teacher)).thenReturn(optionalTeacher.get());
 
-		lenient().when(userRepositoryMock.count()).thenReturn(5l);
+		lenient().when(userRepositoryMock.count()).thenReturn(1l);
 
 		Teacher savedTeacher = teacherService.create(createRequest);
 
-		assertEquals(null, savedTeacher);
+		assertEquals(teacher, savedTeacher, "should return saved teacher");
+		assertEquals(1l, userRepositoryMock.count());
 	}
 
 }
